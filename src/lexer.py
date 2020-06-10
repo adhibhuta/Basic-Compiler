@@ -23,9 +23,12 @@ class Lexer:
         while self.cur_char == ' 'or self.cur_char == '\t' or self.cur_char == '\r':
             self.next_char()
     def remove_comments(self):
-        pass
+        if self.cur_char == '#':
+            while self.cur_char != '\n':
+                self.next_char()
     def get_token(self):
         self.remove_whitespaces()
+        self.remove_comments()
         token = None
         if self.cur_char == '+':
             token = Token(self.cur_char, TokenType.PLUS)
@@ -39,6 +42,38 @@ class Lexer:
             token = Token(self.cur_char, TokenType.NEWLINE)
         elif self.cur_char == '\0':
             token = Token(self.cur_char, TokenType.EOF)
+        elif self.cur_char == '=':
+            # We need to check weather the token is a = or ==
+            if self.peek() == '=':
+                last_char = self.cur_char
+                self.next_char()
+                token = Token(last_char+self.cur_char, TokenType.EQEQ)
+            else:
+                token = Token(self.cur_char, TokenType.EQ)
+        elif self.cur_char == '>':
+            # We need to check weather the token is a > or >=
+            if self.peek() == '=':
+                last_char = self.cur_char
+                self.next_char()
+                token = Token(last_char+self.cur_char, TokenType.GTEQ)
+            else:
+                token = Token(self.cur_char, TokenType.GT)
+        elif self.cur_char == '<':
+            # We need to check weather the token is a < or <=
+            if self.peek() == '=':
+                last_char = self.cur_char
+                self.next_char()
+                token = Token(last_char+self.cur_char, TokenType.LTEQ)
+            else:
+                token = Token(self.cur_char, TokenType.LT)
+        elif self.cur_char == '!':
+            # We need to check weather the token is != and ! alone is not allowed
+            if self.peek() == '=':
+                last_char = self.cur_char
+                self.next_char()
+                token = Token(last_char+self.cur_char, TokenType.NOTEQ)
+            else:
+                self.abort("Found ! instead of !=")
         else:
             self.abort(f"Unknown token {self.cur_char}")
         self.next_char()
