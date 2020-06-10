@@ -86,6 +86,20 @@ class Lexer:
                     self.abort(f"Illegal charecter used {self.cur_char}")
                 self.next_char()
             token = Token(self.source[start_pos: self.cur_pos], TokenType.STRING)
+        elif self.cur_char.isdigit():
+            #The leading charecter has to be a digit .9 is not allowed 0.9 is alloweda
+            #Get all consecutive numbers
+            start_pos = self.cur_pos
+            while self.peek().isdigit():
+                self.next_char()
+            if self.peek() == '.':
+                self.next_char()
+                if not self.peek().isdigit():
+                    self.abort(f"Charecter after decimal is not digit: {self.peek()}")
+                while self.peek().isdigit():
+                    self.next_char()
+            token = Token(self.source[start_pos:self.cur_pos+1], TokenType.NUMBER)
+        #Get all the keywords
         else:
             self.abort(f"Unknown token {self.cur_char}")
         self.next_char()
