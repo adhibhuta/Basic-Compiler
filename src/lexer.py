@@ -100,6 +100,19 @@ class Lexer:
                     self.next_char()
             token = Token(self.source[start_pos:self.cur_pos+1], TokenType.NUMBER)
         #Get all the keywords
+        elif self.cur_char.isalpha():
+            #First charecter in keyword should be a letter and not Numeric
+            #After that it allows alphanumeric
+            start_pos = self.cur_pos
+            while self.peek().isalnum():
+                self.next_char()
+            #Check if the Token is a keyword
+            tokentext = self.source[start_pos: self.cur_pos+1]
+            keyword = Token.check_keyword(tokentext)
+            if keyword == None:
+                token = Token(tokentext, TokenType.IDENT)
+            else:
+                token = Token(tokentext, keyword)
         else:
             self.abort(f"Unknown token {self.cur_char}")
         self.next_char()
@@ -109,6 +122,12 @@ class Token:
     def __init__(self, text, kind):
         self.text = text
         self.kind = kind
+    @staticmethod
+    def check_keyword(keyword):
+        for kind in TokenType:
+            if kind.name == keyword and kind.value >= 100 and kind.value < 200: 
+                return kind
+        return None
 
 class TokenType(Enum):
     NONE = None #This is native NoneType, its enum like rust but uses Py default
@@ -141,3 +160,8 @@ class TokenType(Enum):
     LTEQ = 209
     GT = 210
     GTEQ = 211
+
+'''
+# TODO:
+    -[ ] Create a funtion to identify None
+'''
