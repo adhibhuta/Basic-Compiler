@@ -1,4 +1,5 @@
 from enum import Enum
+import sys
 
 class Lexer:
     def __init__(self, source):
@@ -16,19 +17,37 @@ class Lexer:
             self.cur_char = '\0'
         else:
             self.cur_char = self.source[self.cur_pos]
-    def abort(self):
-        pass
+    def abort(self, message):
+        sys.exit(f"Lexer exiting with message:{message}")
     def remove_whitespaces(self):
-        pass
+        while self.cur_char == ' 'or self.cur_char == '\t' or self.cur_char == '\r':
+            self.next_char()
     def remove_comments(self):
         pass
     def get_token(self):
-        pass #Start fron here
+        self.remove_whitespaces()
+        token = None
+        if self.cur_char == '+':
+            token = Token(self.cur_char, TokenType.PLUS)
+        elif self.cur_char == '-':
+            token = Token(self.cur_char, TokenType.MINUS)
+        elif self.cur_char == '*':
+            token = Token(self.cur_char, TokenType.ASTERISK)
+        elif self.cur_char == '/':
+            token = Token(self.cur_char, TokenType.SLASH)
+        elif self.cur_char == '\n':
+            token = Token(self.cur_char, TokenType.NEWLINE)
+        elif self.cur_char == '\0':
+            token = Token(self.cur_char, TokenType.EOF)
+        else:
+            self.abort(f"Unknown token {self.cur_char}")
+        self.next_char()
+        return token
 
 class Token:
-    def __init__(self, _text, _kind):
-        self,text = _text
-        self.kind = _kind
+    def __init__(self, text, kind):
+        self.text = text
+        self.kind = kind
 
 class TokenType(Enum):
     '''
@@ -61,4 +80,4 @@ class TokenType(Enum):
     LT = 208
     LTEQ = 209
     GT = 210
-    GTEQ = 2
+    GTEQ = 211
