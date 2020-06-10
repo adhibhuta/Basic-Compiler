@@ -125,7 +125,9 @@ class Token:
     @staticmethod
     def check_keyword(keyword):
         for kind in TokenType:
-            if kind.name == keyword and kind.value >= 100 and kind.value < 200: 
+            if kind.name == keyword and kind.value == None:
+                return kind
+            elif kind.name == keyword and kind.value >= 100 and kind.value < 200: 
                 return kind
         return None
 
