@@ -29,7 +29,7 @@ class Lexer:
     def get_token(self):
         self.remove_whitespaces()
         self.remove_comments()
-        token = None
+        token = Token(None, TokenType.NONE)
         if self.cur_char == '+':
             token = Token(self.cur_char, TokenType.PLUS)
         elif self.cur_char == '-':
@@ -74,6 +74,18 @@ class Lexer:
                 token = Token(last_char+self.cur_char, TokenType.NOTEQ)
             else:
                 self.abort("Found ! instead of !=")
+        #Return a string capability
+        elif self.cur_char == '"':
+            self.next_char()
+            start_pos = self.cur_pos
+            while self.cur_char != '"':
+                # Don't allow special characters in the string. No escape characters, newlines, tabs, or %.
+                #We can't do this as we are using C's `printf` statement, once we move to rustpython
+                #This wont be an issue
+                if self.cur_char == '\r' or self.cur_char == '\n' or self.cur_char == '\t' or self.cur_char == '\\' or self.cur_char == '%':
+                    self.abort(f"Illegal charecter used {self.cur_char}")
+                self.next_char()
+            token = Token(self.source[start_pos: self.cur_pos], TokenType.STRING)
         else:
             self.abort(f"Unknown token {self.cur_char}")
         self.next_char()
@@ -85,8 +97,7 @@ class Token:
         self.kind = kind
 
 class TokenType(Enum):
-    '''
-    '''
+    NONE = None #This is native NoneType, its enum like rust but uses Py default
     EOF = -1
     NEWLINE = 0
     NUMBER = 1
