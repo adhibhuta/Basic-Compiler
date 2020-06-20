@@ -44,7 +44,7 @@ class Parser:
             if self.check_token(TokenType.STRING):
                 self.next_token()
             else:
-                self.experssion()
+                self.expression()
         elif self.check_token(TokenType.IF):
             print("IF-STATEMENT")
             self.next_token()
@@ -54,12 +54,40 @@ class Parser:
             while not self.check_token(TokenType.ENDIF): #Iterate till there is an endif
                 self.statement()
             self.match(TokenType.ENDIF)#Make sure ended with endif
+        elif self.check_token(TokenType.WHILE):
+            print("WHILE-STATEMENT")
+            self.next_token()
+            self.comparison()
+            self.match(TokenType.THEN)
+            self.nl()
+            while not self.check_token(TokenType.ENDWHILE):
+                self.statement()
+            self.match(TokenType.ENDWHILE)
+        elif self.check_token(TokenType.LABEL):
+            print("LABEL-STATEMENT")
+            self.next_token()
+            self.match(TokenType.IDENT)
+        elif self.check_token(TokenType.GOTO):
+            print("GOT-STATEMENT")
+            self.next_token()
+            self.match(TokenType.IDENT)
+        elif self.check_token(TokenType.LET):
+            print("LET-STATEMENT")
+            self.next_token()
+            self.match(TokenType.IDENT)
+            self.match(TokenType.EQ)
+            self.expression()
+        elif self.check_token(TokenType.INPUT):
+            print("INPUT-STATEMENT")
+            self.next_token()
+            self.match(TokenType.IDENT)
+        else:
+            self.abort("Invalid statement " + self.cur_token.text + " (" + self.cur_token.kind.name + ")")
         self.nl()
     def nl(self):
-        if self.check_token(TokenType.NEWLINE):
+        if self.match(TokenType.NEWLINE):
             print("NEWLINE-STATEMENT")
-            self.next_token()
+        else:
+            self.abort("Expected newline")
         while self.check_token(TokenType.NEWLINE):
             self.next_token()
-
-

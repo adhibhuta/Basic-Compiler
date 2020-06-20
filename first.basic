@@ -1,6 +1,7 @@
+LABEL loop
 PRINT "hello, world!"
 
+faf
 
 
-PRINT "second line"
-PRINT "and a third..."
+GOTO loop
