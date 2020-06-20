@@ -34,7 +34,23 @@ class Parser:
         self.next_token()
         return True
     def program(self):
-        while not self.match(TokenType.EOF):
+        print("PROGRAM")
+        while not self.check_token(TokenType.EOF):
             self.statement() #Start from here; write the statement fucntion
+    def statement(self):
+        if self.check_token(TokenType.PRINT):
+            print("PRINT-STATEMENT")
+            self.next_token()
+            if self.check_token(TokenType.STRING):
+                self.next_token()
+            else:
+                self.experssion()
+        self.nl()
+    def nl(self):
+        if self.check_token(TokenType.NEWLINE):
+            print("NEWLINE-STATEMENT")
+            self.next_token()
+        while self.check_token(TokenType.NEWLINE):
+            self.next_token()
 
 
