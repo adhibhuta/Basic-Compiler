@@ -45,6 +45,15 @@ class Parser:
                 self.next_token()
             else:
                 self.experssion()
+        elif self.check_token(TokenType.IF):
+            print("IF-STATEMENT")
+            self.next_token()
+            self.comparison()
+            self.match(TokenType.THEN)
+            self.nl()
+            while not self.check_token(TokenType.ENDIF): #Iterate till there is an endif
+                self.statement()
+            self.match(TokenType.ENDIF)#Make sure ended with endif
         self.nl()
     def nl(self):
         if self.check_token(TokenType.NEWLINE):
