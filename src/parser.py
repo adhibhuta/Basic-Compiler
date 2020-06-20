@@ -35,6 +35,8 @@ class Parser:
         return True
     def program(self):
         print("PROGRAM")
+        while self.check_token(TokenType.NEWLINE):
+            self.next_token()
         while not self.check_token(TokenType.EOF):
             self.statement() #Start from here; write the statement fucntion
     def statement(self):
