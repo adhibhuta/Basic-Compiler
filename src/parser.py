@@ -87,9 +87,46 @@ class Parser:
             self.abort("Invalid statement " + self.cur_token.text + " (" + self.cur_token.kind.name + ")")
         self.nl()
     def nl(self):
-        if self.match(TokenType.NEWLINE):
-            print("NEWLINE-STATEMENT")
-        else:
-            self.abort("Expected newline")
+        print("NEWLINE-STATEMENT")
+        self.match(TokenType.NEWLINE)
         while self.check_token(TokenType.NEWLINE):
             self.next_token()
+    def is_comparison_operator(self):
+        return self.check_token(TokenType.GT) or self.check_token(TokenType.GTEQ) or self.check_token(TokenType.LT) or self.check_token(TokenType.LTEQ) or self.check_token(TokenType.EQEQ) or self.check_token(TokenType.NOTEQ)
+
+    def comparison(self):
+        print("COMPARISON-STATEMENT")
+        self.expression()
+
+        if self.is_comparison_operator():
+            self.next_token()
+            self.expression()
+        while self.is_comparison_operator():
+            self.next_token()
+            self.expression()
+    def expression(self):
+        print("EXPRESSION-STATEMENT")
+        self.term()
+        while self.check_token(TokenType.PLUS) or self.check_token(TokenType.MINUS):
+            self.next_token()
+            self.term()
+    def term(self):
+        print("TERM-STATEMENT")
+        self.unary()
+        while self.check_token(TokenType.ASTERISK) or self.check_token(TokenType.SLASH):
+            self.next_token()
+            self.unary()
+    def unary(self):
+        print("UNARY-STATEMENT")
+        if self.check_token(TokenType.PLUS) or self.check_token(TokenType.MINUS):
+            self.next_token()
+        self.primary()
+    def primary(self):
+        print("PRIMARY (" + self.cur_token.text + ")")
+
+        if self.check_token(TokenType.NUMBER):
+            self.next_token()
+        elif self.check_token(TokenType.IDENT):
+            self.next_token()
+        else:
+            self.abort("Unexpected token at " + self.cur_token.text)
