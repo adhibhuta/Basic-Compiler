@@ -43,7 +43,11 @@ class Parser:
         while self.check_token(TokenType.NEWLINE):
             self.next_token()
         while not self.check_token(TokenType.EOF):
-            self.statement() #Start from here; write the statement fucntion
+            self.statement()
+        #Check that all the labels gotoed is declared
+        for label in self.labels_gotoed:
+            if label not in self.labels_declared:
+                self.abort("Trying to GOTO without declation")
     def statement(self):
         if self.check_token(TokenType.PRINT):
             print("PRINT-STATEMENT")
@@ -65,7 +69,7 @@ class Parser:
             print("WHILE-STATEMENT")
             self.next_token()
             self.comparison()
-            self.match(TokenType.THEN)
+            self.match(TokenType.REPEAT)
             self.nl()
             while not self.check_token(TokenType.ENDWHILE):
                 self.statement()
@@ -75,7 +79,7 @@ class Parser:
             self.next_token()
             if self.cur_token in self.labels_declared:
                 self.abort("Label already exists "+ self.cur_token.text)
-             self.labels_declared.add(self.cur_token.text)
+            self.labels_declared.add(self.cur_token.text)
             self.match(TokenType.IDENT)
         elif self.check_token(TokenType.GOTO):
             print("GOTO-STATEMENT")
@@ -85,12 +89,16 @@ class Parser:
         elif self.check_token(TokenType.LET):
             print("LET-STATEMENT")
             self.next_token()
+            if self.cur_token not in self.symbols:
+                self.symbols.add(self.cur_token.text)
             self.match(TokenType.IDENT)
             self.match(TokenType.EQ)
             self.expression()
         elif self.check_token(TokenType.INPUT):
             print("INPUT-STATEMENT")
             self.next_token()
+            if self.cur_token.text not in self.symbols:
+                self.symbols.add(self.cur_token.text)
             self.match(TokenType.IDENT)
         else:
             self.abort("Invalid statement " + self.cur_token.text + " (" + self.cur_token.kind.name + ")")
@@ -136,6 +144,9 @@ class Parser:
         if self.check_token(TokenType.NUMBER):
             self.next_token()
         elif self.check_token(TokenType.IDENT):
+            #Make sure the variable is already there
+            if self.cur_token.text not in self.symbols:
+                self.abort("Referencing variable before assignment: " + self.cur_token.text)
             self.next_token()
         else:
             self.abort("Unexpected token at " + self.cur_token.text)
