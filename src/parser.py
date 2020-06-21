@@ -11,6 +11,11 @@ import sys
 class Parser:
     def __init__(self, lexer):
         self.lexer = lexer
+
+        self.symbols = set()
+        self.labels_declared = set()
+        self.labels_gotoed = set()
+
         self.cur_token = None
         self.peek_token = None
         self.next_token()
@@ -68,10 +73,14 @@ class Parser:
         elif self.check_token(TokenType.LABEL):
             print("LABEL-STATEMENT")
             self.next_token()
+            if self.cur_token in self.labels_declared:
+                self.abort("Label already exists "+ self.cur_token.text)
+             self.labels_declared.add(self.cur_token.text)
             self.match(TokenType.IDENT)
         elif self.check_token(TokenType.GOTO):
-            print("GOT-STATEMENT")
+            print("GOTO-STATEMENT")
             self.next_token()
+            self.labels_gotoed.add(self.cur_token.text)
             self.match(TokenType.IDENT)
         elif self.check_token(TokenType.LET):
             print("LET-STATEMENT")
